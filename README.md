@@ -1,4 +1,4 @@
-# Sequence-Structure Similarity Network
+# PESTO: Protein Evolutionary Similarity and Topological Organization
 
 ## Overview
 Some scripts to fetch and align protein structures from the AlphaFold database.
@@ -12,7 +12,7 @@ Some scripts to fetch and align protein structures from the AlphaFold database.
 2. Extract AlphaFold IDs from hit tables
    * Using `awk`: run the following
      *  `awk '{print $2}' alis_afdb50.m8 > alis_afdb50_ids.txt`
-        *  Change inpur and output file names as needed
+        *  Change input and output file names as needed
 3. Run `fetch_af_pdb.py` to download PDB files from AlphaFold database
    * `python fetch_af_pdb.py -i alis_afdb50_ids.txt -o Output/folder` 
 4. Run `align_all.py` to perform pairwise alignment and TM-score calculation for all downloaded files

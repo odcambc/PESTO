@@ -3,7 +3,6 @@ import subprocess
 import itertools
 import threading
 import queue
-import os
 from pathlib import Path
 import pandas as pd
 
@@ -221,7 +220,7 @@ def run_usalign_and_parse_with_aligned(pdb_pair):
     # -o superimposes structure1 onto structure2
     aligned_pdb_name = pdb_pair[0].stem
     reference_pdb_name = pdb_pair[1].stem
-    mapped_pdb_name = f"{aligned_pdb_name}_onto_{reference_pdb_name}.pdb"
+    mapped_pdb_name = f"{aligned_pdb_name}_onto_{reference_pdb_name}"
 
     output_file = aligned_output_dir / mapped_pdb_name
 

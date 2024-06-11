@@ -51,6 +51,12 @@ parser.add_argument(
     action="store_true",
     help="Suppress all output, but still show errors (default: False)",
 )
+parser.add_argument(
+    "-x",
+    "--executable",
+    type=str,
+    help="Specify the path to the USalign executable (default: ~/bin/USalign)",
+)
 cli_args = parser.parse_args()
 
 if cli_args.silent:
@@ -78,9 +84,31 @@ else:
     if not SILENT:
         print(f"Aligning files in directory {DIR}")
 
+if cli_args.executable:
+    USALIGN = Path(cli_args.executable).expanduser().resolve()
+    # Check if USalign runs
+    try:
+        subprocess.call(USALIGN, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except FileNotFoundError:
+        print(f"{USALIGN} not found")
+        exit(1)
+else:
+    try:
+        subprocess.call("USalign", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        USALIGN = "USalign"
+    except FileNotFoundError:
+        # handle file not found error.
+        print("USalign not found in path")
+        try:
+            USALIGN = Path("~/bin/USalign").expanduser().resolve()
+            subprocess.call(str(USALIGN), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except FileNotFoundError:
+            print("USalign not found at ~/bin/USalign")
+            print("Please specify the path to the USalign executable using the -x flag")
+            exit(1)
+
 OUT_FILE = cli_args.output
 NUM_WORKER_THREADS = cli_args.threads
-
 aligned_output_dir = cli_args.aligned_dir
 
 reference_model = cli_args.reference
@@ -173,7 +201,7 @@ def parse_usalign_output(stdout):
 
 def run_usalign_and_parse(pdb_pair):
     # Runs USalign and just generates the TM-score
-    command = f"~/bin/USalign {pdb_pair[0]} {pdb_pair[1]}"
+    command = f"{str(USALIGN)} {pdb_pair[0]} {pdb_pair[1]}"
     cmd = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     parsed_output = parse_usalign_output(cmd.stdout)
 
@@ -197,7 +225,7 @@ def run_usalign_and_parse_with_aligned(pdb_pair):
 
     output_file = aligned_output_dir / mapped_pdb_name
 
-    command = f"~/bin/USalign {pdb_pair[0]} {pdb_pair[1]} -o {str(output_file)}"
+    command = f"{str(USALIGN)} {pdb_pair[0]} {pdb_pair[1]} -o {str(output_file)}"
     cmd = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     parsed_output = parse_usalign_output(cmd.stdout)
 

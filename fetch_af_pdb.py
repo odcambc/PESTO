@@ -63,6 +63,16 @@ parser.add_argument(
     action="store_true",
     help="Force download of all files (overwrite existing files)",
 )
+parser.add_argument(
+    "--min_qlen",
+    type=int,
+    help="Skip models with qlen below this value",
+)
+parser.add_argument(
+    "--min_tlen",
+    type=int,
+    help="Skip models with tlen below this value",
+)
 args = parser.parse_args()
 
 input_file = args.input
@@ -117,6 +127,17 @@ with open(input_file, "r", encoding="utf-8") as f:
             alphafold_ID = line.strip()
         elif INPUT_FORMAT == "m8":
             alphafold_ID = line.split()[1]
+            # Check for qlen and tlen if specified
+            if args.min_qlen:
+                if int(line.split('\t')[9]) < args.min_qlen:
+                    if not args.silent:
+                        print(f"Skipping {alphafold_ID} due to low sequence identity (qlen).")
+                    continue
+            if args.min_tlen:
+                if int(line.split('\t')[12]) < args.min_tlen:
+                    if not args.silent:
+                        print(f"Skipping {alphafold_ID} due to low sequence identity (tlen).")
+                    continue
         if not args.force_download:
             if check_file(alphafold_ID, output_dir):
                 if not args.silent:

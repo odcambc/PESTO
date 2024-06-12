@@ -3,23 +3,26 @@
 ## Overview
 Some scripts to fetch and align protein structures from the AlphaFold database.
 
-## Instructions
-
-1. Install requirements
+## Requirements
    * [USAlign standalone](https://zhanggroup.org/US-align/)
    * python libraries (install with `pip install`)
      * requests
      * MDAnalysis
      * pandas
      * pdb-tools
+
+## Instructions
+
+1. Install requirements
 2. Find targets with Foldseek
    * Submit a target PDB to [Foldseek](https://search.foldseek.com/)
    * Download hit tables (in M8 format)
-     * You'll get a series of files giving hits across different databases
 3. Download model PDBs from AlphaFold database
    * Run `fetch_af_pdb.py` with hit table to download models to a folder
      * `python fetch_af_pdb.py -i alis_afdb50.m8 -o Output/folder` 
-       * Get more options using `python fetch_af_pdb.py -h`
+     * Specify minimum tlen or qlen using `--min_tlen` and `--min_qlen` flags 
+       * See description of foldseek M8 fields here: https://github.com/steineggerlab/foldseek/issues/59
+     * Get more options using `python fetch_af_pdb.py -h`
    * Alternatively, supply a list of IDs to download
      *  Extract them from the m8 output using awk:
         *  `awk '{print $2}' alis_afdb50.m8 > alis_afdb50_ids.txt`
@@ -34,7 +37,8 @@ Some scripts to fetch and align protein structures from the AlphaFold database.
 5. Run `merge_pdbs.py` to combine all the aligned PDB files into a single file
    * `python merge_pdbs.py -i output/aligned -o aligned_models.pdb -r output/folder/AF-O25823-F1-model_v4.pdb`
    * This will generate a single PDB file containing all the aligned structures. This is required to generate the pseudo-density map.
-6. Run `pseudo_density.py` to generate a pseudo-density map from the merged PDB file
+6. Open the output merged PDB file in PyMOL and save it as a *single* PDB file containing all models
+7. Run `pseudo_density.py` to generate a pseudo-density map from the combined PDB file
    * `python pseudo_density.py -i aligned_models.pdb -o pseudo_density.dx`
    * This will generate a pseudo-density map in DX format that can be opened in, e.g., ChimeraX.
    * You can set the grid spacing (in Angstroms) for sampling with the `-d` flag. The default is 0.5.

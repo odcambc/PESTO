@@ -261,6 +261,8 @@ class Worker(threading.Thread):
                 return
             if pair[1].name == f"{reference_model}":
                 run_usalign_and_parse_with_aligned(pair)
+            elif pair[0].name == f"{reference_model}":
+                run_usalign_and_parse_with_aligned(pair[::-1])
             else:
                 run_usalign_and_parse(pair)
             if not QUIET:

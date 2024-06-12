@@ -1,0 +1,10 @@
+*.pdb
+*.pse
+*.dx
+*.csv
+aligned/*
+*.m8
+*.ipynb_checkpoints
+*.txt
+*.log
+*.ipynb
